@@ -1,185 +1,62 @@
-
-
 $(document).ready(function() {
 
-  //hide my Game Rules first
-  $('#rules').hide();
+var dice;
+var dice1;
+var score = 0;
+var score2 = 0;
+var total1 = 0;
+var total2 = 0;
+var totalscore1 = [];
+var totalscore2 = [];
 
-  //show game rules onclick
-  $('.well h3').click(function() {
-    $('#rules').fadeToggle(100);
-  });
+   $("#roll-player-1").click(function playOne () {
+     dice = Math.floor(Math.random() * 6 + 1);
+     document.getElementById('dice-1').innerHTML =  dice;
 
-  //hide the game section
-  $('.wrapper').hide();
+     if (dice == 1) {
+       score = 0;
+       totalscore1 = [];
+       total1 += dice;
+       document.getElementById('score-1').innerHTML = score;
+       $(".playerone-buttons").hide();
+       $(".playertwo-buttons").show();
+     } else {
+       totalscore1.push(dice);
+     }
+   });
+ $("#hold-player-1").click(function() {
+   totalscore1.forEach(function(totalscore) {
+            score += totalscore;
+   });
+   document.getElementById('score-1').innerHTML = score;
+   $(".playerone-buttons").hide();
+   $(".playertwo-buttons").show();
 
-  //show game section onclick
-  $('#game').click(function() {
-    $('.wrapper').fadeToggle(100);
-    $('#tron').hide();
-  });
+ });
+ $("#roll-player-2").click(function() {
+   dice2 = Math.floor(Math.random() * 6 + 1);
+   document.getElementById('dice-2').innerHTML =  dice2;
+
+   if (dice2 == 1) {
+     score2 = 0;
+     totalscore2 = [];
+     total2 += dice;
+     document.getElementById('score-2').innerHTML = score2;
+     $(".playerone-buttons").show();
+     $(".playertwo-buttons").hide();
+   } else {
+     totalscore2.push(dice2);
+   }
+ });
+
+ $("#hold-player-2").click(function() {
+   totalscore2.forEach(function(totalscore) {
+            score2 += totalscore;
+   });
+   document.getElementById('score-2').innerHTML = score2;
+   $(".playerone-buttons").show();
+   $(".playertwo-buttons").hide();
+
+
+ });
 });
-
-function roll() {
-  var rol = Math.floor(Math.random() * 6) + 1;
-  $('#score').html(rol);
-}
-
-function Player() {
-  this.resultsArray = [];
-  this.total = 0;
-}
-
-Player.prototype.calcSum = function() {
-  var arraySum = 0;
-  for(var i=0; i<this.resultsArray.length; i++){
-    arraySum += parseInt(this.resultsArray[i]);
-  };
-  return arraySum;
-}
-
-$('#roll').click(function() {
-  roll();
-
-});
-
-var scores, roundScore, activePlayer,gamePlaying;
-var btnRoll = document.querySelector('.btn-roll');
-var btnHold = document.querySelector('.btn-hold');
-
-//dice images
-var diceimgs = {
- diceimg01: "https://cdn.pbrd.co/images/70YJMCVVR.png",
- diceimg02: 'https://cdn.pbrd.co/images/711lemsMX.png',
- diceimg03: "https://cdn.pbrd.co/images/711NjfjV5.png",
- diceimg04: "https://cdn.pbrd.co/images/712dK3C2z.png",
- diceimg05: "https://cdn.pbrd.co/images/70Zqc4icX.png",
- diceimg06: "https://cdn.pbrd.co/images/712DzRw22.png",
- diceimg11: "https://cdn.pbrd.co/images/713n3lHQN.png",
- diceimg12: 'https://cdn.pbrd.co/images/713JSMJDr.png',
- diceimg13: "https://cdn.pbrd.co/images/HvoZO4Gb.png",
- diceimg14: "https://cdn.pbrd.co/images/HvqN3Kjq.png",
- diceimg15: "https://cdn.pbrd.co/images/714IXBStH.png",
- diceimg16: "https://cdn.pbrd.co/images/714ZovsdD.png"
-};
-init();
-
-document.querySelector('.btn-roll').addEventListener('click', function(){
-	if (gamePlaying) {
-		// 1. random number
-		var dice = Math.floor(Math.random() * 6) + 1;
-
-		// 2. display result
-		var diceDOM = document.querySelector('.dice');
-		diceDOM.style.display = 'block';
-		diceDOM.src = diceimgs['diceimg' + activePlayer + dice];
-
-		document.querySelector('#current-' + activePlayer).innerHTML = '<em>' + dice + '</em';
-
-		// 3. Update round score if the rolled number is not 1
-		if (dice !== 1) {
-			hideRolledMsg();
-			//add score
-			roundScore += dice;
-			document.querySelector('#current-' + activePlayer).textContent = roundScore;
-		} else {
-			//disable button
-
-			disableBtn(btnRoll, 1000);
-			hideRolledMsg();
-			document.querySelector('.player-'+activePlayer+'-rolled-1').style.visibility = 'visible';
-			nextPlayer();
-		}
-	}
-});
-document.querySelector('.btn-hold').addEventListener('click', function(){
-		if (gamePlaying) {
-			disableBtn(btnRoll, 1000);
-			// Add current score to global score
-			scores[activePlayer] += roundScore;
-
-			//Update the UI
-			document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
-
-			//check if player won the game
-
-			if (scores[activePlayer] >= 100) {
-				document.querySelector('#name-' + activePlayer).textContent = 'Winner!';
-				document.querySelector('.dice').style.display = 'none';
-				document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner-' + activePlayer);
-				document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active-' + activePlayer);
-				gamePlaying = false;
-
-			} else {
-				nextPlayer();
-			}
-		}
-});
-document.querySelector('.btn-new').addEventListener('click', init);
-
-document.querySelector('.btn-rules').addEventListener('click', function(){
-	    var games = document.getElementsByClassName('game-panel');
-		for(i=0;i<games.length;i++){
-			games[i].style.display = 'none';
-		}
-	    document.querySelector('.btn-back').style.display = 'block';
-		var rules = document.getElementsByClassName('rules-panel');
-		for(i=0;i<rules.length;i++){
-			rules[i].style.display = 'block';
-		}
-});
-document.querySelector('.btn-back').addEventListener('click', function(){
-	    var games = document.getElementsByClassName('game-panel');
-		for(i=0;i<games.length;i++){
-			games[i].style.display = 'block';
-		}
-	    document.querySelector('.btn-back').style.display = 'none';
-		var rules = document.getElementsByClassName('rules-panel');
-		for(i=0;i<rules.length;i++){
-			rules[i].style.display = 'none';
-		}
-});
-function init() {
-	scores = [0,0];
-	roundScore = 0;
-	activePlayer = 0;
-	gamePlaying = true;
-	document.querySelector('.dice').style.display = 'none';
-	document.getElementById('score-0').textContent = '0';
-	document.getElementById('score-1').textContent = '0';
-	document.getElementById('current-0').textContent = '0';
-	document.getElementById('current-1').textContent = '0';
-	document.querySelector('.player-0-rolled-1').style.visibility = 'hidden';
-	document.querySelector('.player-1-rolled-1').style.visibility = 'hidden';
-	document.querySelector('#name-0').textContent = 'Player 1';
-	document.querySelector('#name-1').textContent = 'Player 2';
-	document.querySelector('.player-0-panel').classList.add('active-0');
-	document.querySelector('.player-0-panel').classList.remove('winner-0');
-	document.querySelector('.player-1-panel').classList.remove('winner-1');
-}
-function nextPlayer() {
-	//next player
-		var icons = document.getElementsByTagName('i');
-		for(i=0;i<icons.length;i++){
-			icons[i].classList.remove('color-' + activePlayer);
-		}
-		document.querySelector('.dice').style.display = 'none';
-		document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active-' + activePlayer);
-		activePlayer ===0 ? activePlayer = 1 : activePlayer = 0;
-		roundScore = 0;
-		for(i=0;i<icons.length;i++){
-			icons[i].classList.add('color-' + activePlayer);
-		}
-		document.querySelector('.player-' + activePlayer + '-panel').classList.add('active-' + activePlayer);
-		document.querySelector('#current-0').textContent = '0';
-		document.querySelector('#current-1').textContent = '0';
-}
-function disableBtn(btn, time) {
-	   //disable button
-		btn.disabled = true;
-      	setTimeout(function(){btn.disabled = false;},time);
-}
-function hideRolledMsg(){
-	document.querySelector('.player-0-rolled-1').style.visibility = 'hidden';
-	document.querySelector('.player-1-rolled-1').style.visibility = 'hidden';
-}
